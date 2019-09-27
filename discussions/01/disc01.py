@@ -1,4 +1,6 @@
-
+# Nick Lin
+# DSC 80 fa19
+# 09/27/19
 import numpy as np
 import os
 
@@ -20,7 +22,7 @@ def data2array(filepath):
     100000
     """
 
-    return ...
+    return np.genfromtxt(filepath, delimiter=',')[1:]
 
 
 def ends_in_9(arr):
@@ -36,4 +38,4 @@ def ends_in_9(arr):
     True
     """
 
-    return ...
+    return np.mean(np.mod(arr, .1) == .09)
