@@ -58,8 +58,12 @@ def median(nums):
     >>> median([1, 2, 3, 4]) == 2.5
     True
     """
-    
-    return ...
+    sortedNums = sorted(nums)
+    if len(sortedNums) % 2 == 0:
+        return (sortedNums[len(sortedNums) // 2] + sortedNums[(len(sortedNums) - 1) // 2]) / 2
+    return sortedNums[(len(sortedNums) - 1) // 2]
+
+
 
 
 # ---------------------------------------------------------------------
@@ -82,8 +86,17 @@ def same_diff_ints(ints):
     >>> same_diff_ints([1,3,5,7,9])
     False
     """
-
-    return ...
+    if len(ints) < 2:
+        return False
+    # Concept: since the values are close together, we'll need to iterate by checking distances of 1, 
+    # then distances of 2, and so on
+    distance = 1
+    while (len(ints) - distance) != -1:
+        for i in range(len(ints) - distance):
+            if abs(ints[i] - ints[i + distance]) == distance:
+                return True
+        distance += 1
+    return False
 
 
 # ---------------------------------------------------------------------
@@ -106,9 +119,11 @@ def prefixes(s):
     >>> prefixes('aaron')
     'aaaaaraaroaaron'
     """
+    if len(s) == 0:
+        return ""
+    return prefixes(s[:-1]) + s
 
 
-    return ...
 
 
 # ---------------------------------------------------------------------
@@ -132,8 +147,14 @@ def evens_reversed(N):
     >>> evens_reversed(10)
     '10 08 06 04 02'
     """
-    
-    return ...
+    if N % 2 == 1:
+        N -= 1
+    digits = len(str(N))
+    s = ""
+    while N != 0:
+        s += " " + str(N).zfill(digits)
+        N -= 2
+    return s[1:]
 
 
 # ---------------------------------------------------------------------
@@ -153,8 +174,13 @@ def last_chars(fh):
     >>> last_chars(open(fp))
     'hrg'
     """
-
-    return ...
+    s = ""
+    for line in fh:
+        if len(line.strip("\n")) == 0:
+            s += ""
+        else:
+            s += line.strip("\n")[-1]
+    return s
 
 
 # ---------------------------------------------------------------------
@@ -179,7 +205,7 @@ def arr_1(A):
     True
     """
 
-    return ...
+    return A + np.sqrt(np.arange(len(A)))
 
 
 def arr_2(A):
@@ -200,7 +226,7 @@ def arr_2(A):
     True
     """
 
-    return ...
+    return A % 16 == 0
 
 
 def arr_3(A):
@@ -224,7 +250,7 @@ def arr_3(A):
     True
     """
 
-    return ...
+    return np.round(A[1:] / A[:-1] - 1, 2)
 
 
 def arr_4(A):
@@ -245,8 +271,11 @@ def arr_4(A):
     >>> out == 1
     True
     """
-
-    return ...
+    leftOver = np.cumsum(20 % A)
+    ans = np.where(A <= leftOver)
+    if len(ans[0]):
+        return(ans[0][0])
+    return(-1)
 
 
 # ---------------------------------------------------------------------
@@ -273,7 +302,39 @@ def movie_stats(movies):
     True
     """
 
-    return ...
+    movies = movies.sort_values("Year")
+    d = {}
+    try:
+        d["num_years"] = len(movies.groupby("Year").count())
+    except:
+        d["num_years"] = -1
+    try:
+        d["tot_movies"] = sum(movies["Number of Movies"])
+    except:
+        d["tot_movies"] = -1
+    try:
+        d["yr_fewest_movies"] = movies[movies["Number of Movies"] \
+                                       == min(movies["Number of Movies"])].sort_values("Year").iloc[0]["Year"]
+    except:
+        d["yr_fewest_movies"] = -1
+    try:
+        d["avg_gross"] = sum(movies["Total Gross"]) / d["num_years"]
+    except:
+        d["avg_gross"] = -1
+    try:
+        d["highest_per_movie"] = movies.loc[(movies["Total Gross"] / movies["Number of Movies"]).idxmin()]["Year"]
+    except:
+        d["highest_per_movie"] = -1
+    try:
+        d["second_lowest"] = movies.sort_values("Total Gross").iloc[1]["#1 Movie"]
+    except:
+        d["second_lowest"] = -1
+    try:
+        firstHarryPotterYear = movies[movies["#1 Movie"].str.contains("Harry Potter")].sort_values("Year").iloc[0]["Year"]
+        d["avg_after_harry"] = np.mean(movies[movies["Year"] > firstHarryPotterYear]["Number of Movies"])
+    except:
+        d["avg_after_harry"] = -1
+    return pd.Series(d)
     
 
 # ---------------------------------------------------------------------
@@ -310,7 +371,18 @@ def parse_malformed(fp):
     True
     """
 
-    return ...
+    with open(fp, "r") as csv:
+        l = []
+        columns = csv.readline().strip().split(",")
+        for line in csv:
+            row = line.strip().split(",")
+            row = list(filter(None, row))
+            row[4] = f"{row[4]},{row[5]}".replace('"', '')
+            row = row[:-1]
+            row[3] = float(row[3].replace('"', ''))
+            row[2] = float(row[2].replace('"', ''))
+            l.append(row)
+    return pd.DataFrame(l, columns=columns)
 
 
 # ---------------------------------------------------------------------
