@@ -33,6 +33,6 @@ def question02(ser):
     True
     """
 
-    return ser[ser % 3 == 0]
+    return ser[ser % 3 == 0].index
 
 

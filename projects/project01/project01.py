@@ -31,8 +31,8 @@ def get_assignment_names(grades):
     >>> 'project02' in names['project']
     True
     '''
-    
-    return ...
+    keywords = ["lab", "project", "midterm", "final", "disc", "checkpoint"]
+    return {keyword:[c for c in grades.columns if (keyword in c.lower()) and ('-' not in c)] for keyword in keywords} 
 
 
 # ---------------------------------------------------------------------
