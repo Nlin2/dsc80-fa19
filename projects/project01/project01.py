@@ -32,8 +32,10 @@ def get_assignment_names(grades):
     True
     '''
     keywords = ["lab", "project", "midterm", "final", "disc", "checkpoint"]
-    return {keyword:[c for c in grades.columns if (keyword in c.lower()) and ('-' not in c)] for keyword in keywords} 
-
+    d = {keyword:[c for c in grades.columns if (keyword in c.lower()) and \
+                  ('-' not in c) and ('_checkpoint') not in c] for keyword in keywords}
+    d["checkpoint"] = [c for c in grades.columns if ('_checkpoint' in c) and ('-' not in c)]
+    return d
 
 # ---------------------------------------------------------------------
 # Question #2
@@ -55,7 +57,20 @@ def projects_total(grades):
     >>> 0.7 < out.mean() < 0.9
     True
     '''
-    return ...
+    assignment_names = get_assignment_names(grades)
+    project_names = assignment_names["project"]
+    grades.fillna(0, inplace=True)
+    scores = pd.Series([0] * len(grades))
+    for p in project_names:
+        try:
+            max_points = grades[p + "_free_response - Max Points"] + grades[p + " - Max Points"]
+            points = grades[p] + grades[p + "_free_response"]
+            score = points / max_points
+        except KeyError:
+            score = grades[p] / grades[p + " - Max Points"]
+        finally:
+            scores += score / len(project_names)
+    return scores
 
 
 # ---------------------------------------------------------------------
