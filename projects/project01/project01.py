@@ -32,10 +32,8 @@ def get_assignment_names(grades):
     True
     '''
     keywords = ["lab", "project", "midterm", "final", "disc", "checkpoint"]
-    d = {keyword:[c for c in grades.columns if (keyword in c.lower()) and \
-                  ('-' not in c) and ('_checkpoint') not in c] for keyword in keywords}
-    d["checkpoint"] = [c for c in grades.columns if ('_checkpoint' in c) and ('-' not in c)]
-    return d
+    return {keyword:[c for c in grades.columns if (keyword in c.lower()) and ('-' not in c)] for keyword in keywords} 
+
 
 # ---------------------------------------------------------------------
 # Question #2
@@ -86,8 +84,7 @@ def last_minute_submissions(grades):
     in on time by the student, yet marked 'late' by Gradescope.
 
     :Example:
-    >>> fp = os.path.join('data', 'grades.csv')
-    >>> grades = pd.read_csv(fp)
+    >>> fp = os 
     >>> out = last_minute_submissions(grades)
     >>> isinstance(out, pd.Series)
     True
@@ -97,7 +94,27 @@ def last_minute_submissions(grades):
     8
     """
 
-    return ...
+    def onlyDelayed(deltaTime, maximiumDelaySEC=21600):
+        time = deltaTime.split(":")
+        trueTimeiSEC = int(time[0])*3600 + int(time[1])*60
+        if (trueTimeiSEC > 0 and trueTimeiSEC< maximiumDelaySEC):
+            return 1
+        else:
+            return 0
+
+    projectList = grades.filter(regex="project\d\d$").columns
+    time = " - Lateness (H:M:S)"
+    projectLatenessList=[]
+
+    for project in projectList:
+        projectLatenessList.append((f'{project}{time}'))
+
+    gradeScopeDelay=pd.Series([0]*grades.shape[0])
+
+    for project in projectLatenessList:
+        gradeScopeDelay += grades.loc[:, project].apply(onlyDelayed)
+    
+    return gradeScopeDelay
 
 
 # ---------------------------------------------------------------------
